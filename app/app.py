@@ -1,22 +1,45 @@
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, Api
 
 
 # Create flask app
 app = Flask(__name__)
 
+# This should be secret, not hard coded. Using name for learning purposes
+app.secret_key = 'george'
+
 # Create an api for flask_restful
 api = Api(app)
 
+items = []
+
 
 # Api works with resources, every resource has to be a class
-class Student(Resource):
+class Item(Resource):
 
 	def get(self, name):
-		return {'student': name}
+		# Filter takes two things: (filtering function, list to filter)
+		item = next(filter(lambda x: x['name'] == name, items), None)  # Next gives us the first item in the filter object
+		return {'item': item}, 200 if item else 404  # Ternary if statement
+
+	def post(self, name):
+		if next(filter(lambda x: x['name'] == name, items), None):
+			return {'message': f'An item with name {name} already exists.'}, 400
+		data = request.get_json()
+		item = {'name': name, 'price': data['price']}
+		items.append(item)
+		return items, 201
+
+
+class ItemList(Resource):
+
+	def get(self):
+		return {'items': items}
+
 
 # Add resource to api
-api.add_resource(Student, '/student/<string:name>')  # http://127.0.0.1:5000/student/Bob
+api.add_resource(Item, '/item/<string:name>')
+api.add_resource(ItemList, '/items')
 
 # Start app
-app.run(port=5000)
+app.run(port=5000, debug=True)
