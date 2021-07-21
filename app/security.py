@@ -1,4 +1,4 @@
-from werkzeug.security import safe_str_cmp
+import hmac
 from user import User
 
 users = [
@@ -12,7 +12,8 @@ userid_mapping = {u.id: u for u in users}
 # Authenticates user based on above dictionaries
 def authenticate(username, password):
 	user = username_mapping.get(username)
-	if user and user.password == password:
+	# Compares two strings safely
+	if user and hmac.compare_digest(user.password, password):
 		return user
 
 
