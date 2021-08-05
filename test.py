@@ -11,7 +11,7 @@ create_table = "CREATE TABLE users (id int, username text, password text)"
 cursor.execute(create_table)
 
 # Manually create first user
-user = (1, 'george', '1234')
+user = (1, 'george', 'asdf')
 insert_query = "INSERT INTO users VALUES (?, ?, ?)"
 
 # Executes SQL query on one item
